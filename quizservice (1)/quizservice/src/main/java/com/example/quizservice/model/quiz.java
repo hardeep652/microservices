@@ -2,6 +2,7 @@ package com.example.quizservice.model;
 
 import java.util.List;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -26,9 +27,8 @@ public class quiz {
     private String title;
 
     @ElementCollection
-    @JoinTable(
-        name = "quiz_questions",
-        joinColumns = @JoinColumn(name = "quiz_id")
-    )
-    private List<Integer> questions; // ✅ Just IDs, so ElementCollection is enough
+    @JoinTable( // ✅ Explicit join table name
+            joinColumns = @JoinColumn(name = "quiz_id"))
+    @Column(name = "questions_id") // ✅ Column name for the List elements
+    private List<Integer> questionsIds;
 }

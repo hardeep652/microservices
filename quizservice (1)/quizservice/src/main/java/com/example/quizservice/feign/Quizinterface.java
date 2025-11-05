@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.example.quizservice.model.QuestionWrapper;
 import com.example.quizservice.model.Response;
 import com.example.quizservice.model.questions;
 
@@ -21,8 +22,10 @@ public interface Quizinterface {
     @GetMapping("/api/questions/generate")
     public ResponseEntity<List<Integer>> getquestionsforquiz(@RequestParam String category, @RequestParam int numQ);
 
+    @PostMapping("/question/getQuestions")
+    public ResponseEntity<List<QuestionWrapper>> getQuestionsFromId(@RequestBody List<Integer> questionIds);
 
     @PostMapping("/api/questions/score")
     public ResponseEntity<Integer> getScore(@RequestBody List<Response> responses);
-    
+
 }

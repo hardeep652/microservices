@@ -3,6 +3,7 @@ package com.example.quizservice.Service;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -13,42 +14,46 @@ import com.example.quizservice.model.quiz;
 
 @Service
 public class quizservice {
-    
-    @Autowired
-    private quizrepository quizrepository;
 
     @Autowired
-    Quizinterface quizinterface;
+    private quizrepository quizRepository;
+
+    @Autowired
+    Quizinterface quizInterface;
 
     public ResponseEntity<String> createQuiz(String category, int numQ, String title) {
-        List<Integer> questionList = quizinterface.getquestionsforquiz(category, numQ).getBody();
+        ResponseEntity<List<Integer>> response;
+        try {
+            response = quizInterface.getquestionsforquiz(category, numQ);
+        } catch (Exception e) {
+            return ResponseEntity.ok("Failed to create quiz: " + e.getMessage());
+        }
+        List<Integer> questions = response.getBody();
+        if (questions == null || questions.isEmpty()) {
+            throw new RuntimeException("Failed to fetch questions for quiz");
+        }
 
         quiz quiz = new quiz();
         quiz.setTitle(title);
-        quiz.setQuestions(questionList);
-        quizrepository.save(quiz);
+        quiz.setQuestionsIds(questions);
+        quizRepository.save(quiz);
 
-    //     quiz newQuiz = new quiz();
-    //     newQuiz.setTitle(title);
-    //     newQuiz.setQuestions(questionList);
+        return new ResponseEntity<>("SUCCESS", HttpStatus.CREATED);
 
-    //     quizrepository.save(newQuiz);
-        
-        return ResponseEntity.ok("Quiz created successfully!");
     }
 
-//     public List<questions> getquizbyid(int id) {
+    // public List<questions> getquizbyid(int id) {
 
-//     // Optional<quiz> foundQuiz = quizrepository.findById(id);
+    // // Optional<quiz> foundQuiz = quizrepository.findById(id);
 
-//     // // Use a lambda instead of method reference
-//     // List<questions> quizQuestions = foundQuiz.map(q -> q.getQuestions()).orElse(null);
+    // // // Use a lambda instead of method reference
+    // // List<questions> quizQuestions = foundQuiz.map(q ->
+    // q.getQuestions()).orElse(null);
 
-//     // System.out.println("Quiz found: " + quizrepository.findById(id));
+    // // System.out.println("Quiz found: " + quizrepository.findById(id));
 
-
-//     // return quizQuestions;
-// }
+    // // return quizQuestions;
+    // }
 
     public ResponseEntity<Integer> calculateresult(int id, List<Response> response) {
         int score = 0;
@@ -57,19 +62,15 @@ public class quizservice {
         // int i=0;
         // for(Response res : response)
         // {
-        //     if(res.getResponse().equals(quizQuestions.get(i).getRightanswer()))
-        //     {
-        //         score++;
-        //     }
-        //     i++;
+        // if(res.getResponse().equals(quizQuestions.get(i).getRightanswer()))
+        // {
+        // score++;
+        // }
+        // i++;
         // }
 
         return ResponseEntity.ok(score);
-        
 
-        
     }
-
-
 
 }
